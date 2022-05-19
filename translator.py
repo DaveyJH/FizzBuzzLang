@@ -14,37 +14,63 @@ import sys
 
 
 class Translator():
-    """Prepares common FizzBuzzLang functions and retrieves file text content
+    """Translates file to FizzBuzzLang string"""
 
-    ---
-    Attributes:
-        look_up: dict -- self-populating dictionary of finary refs
-        INPUT: str -- text content of file passed in CLI
-        STORE_CHAR: str -- allows storing of character at data-space location
-        MOVE_FORWARD: str -- move pointer forward one space in data-space
-        STORE_POS_FIZZ: str -- stores current data-space location in FIZZ loc.
-        END_OF_CODE: str -- prints data
-        TERMINATE_COMMAND: str -- termination command to end fbi
-        FBL_TEXT_ARRAY: list -- INPUT written in finary
-    """
-
-    def __init__(self) -> None:
-        self.look_up = {}
-        self.INPUT = self._retrieve_file()
-        self.STORE_CHAR = "BUZZ FIZZBUZZ FIZZBUZZ "
-        self.MOVE_FORWARD = "FIZZ FIZZ FIZZ"
-        self.STORE_POS_FIZZ = "FIZZ FIZZBUZZ FIZZ"
-        self.END_OF_CODE = """BUZZ FIZZBUZZ FIZZBUZZ BUZZ FIZZ BUZZ FIZZ
+    def __init__(self, input):
+        # self-populating dictionary of finary refs
+        self.__look_up = {}
+        # text content of file passed in CLI
+        self.__INPUT = input
+        # allows storing of character at data-space location
+        self.__STORE_CHAR = "BUZZ FIZZBUZZ FIZZBUZZ "
+        # move pointer forward one space in data-space
+        self.__MOVE_FORWARD = "FIZZ FIZZ FIZZ"
+        # stores current data-space location in FIZZ loc
+        self.__STORE_POS_FIZZ = "FIZZ FIZZBUZZ FIZZ"
+        # prints data in FizzBuzzLang
+        self.__END_OF_CODE = """BUZZ FIZZBUZZ FIZZBUZZ BUZZ FIZZ BUZZ FIZZ
 FIZZ FIZZBUZZ FIZZBUZZ FIZZ
 FIZZBUZZ FIZZ FIZZBUZZBUZZ
 BUZZ BUZZ
 FIZZ FIZZ FIZZ
 FIZZBUZZ BUZZ FIZZ FIZZBUZZBUZZ"""
-        self.TERMINATE_COMMAND = "FIZZBUZZ FIZZBUZZ"
-        self.FBL_TEXT_ARRAY = self._convert_to_fbl()
+        # termination command to end fbi.py
+        self.__TERMINATE_COMMAND = "FIZZBUZZ FIZZBUZZ"
+        # self.__INPUT written in finary
+        self.__FBL_TEXT_LIST = self._convert_to_fbl()
 
-    def _retrieve_file(self):
-        """Retrieves text from file
+    # TODO - transfer to helper function
+    def _convert_to_fbl(self):
+        """Creates a list of FBL characters
+
+        ---
+        returns:
+        # TODO - create custom type
+            list: -- list of FBL converted ASCII characters
+        """
+
+        fbl_text = []
+        for char in self.__INPUT:
+            char_finary = self.__look_up.setdefault(char, " ".join(
+                ["FIZZ" if char == "0" else "BUZZ" for char in bin(
+                    ord(char))[2:]]))
+            fbl_text.append(self.__STORE_CHAR + char_finary)
+
+        return fbl_text
+
+    def print_fbl_doc(self):
+        """Prints a runnable FBL script"""
+
+        print(self.__STORE_POS_FIZZ)
+        for char in self.__FBL_TEXT_LIST:
+            print(char)
+            print(self.__MOVE_FORWARD)
+        print(self.__END_OF_CODE)
+        print(self.__TERMINATE_COMMAND)
+
+
+def retrieve_file():
+    """Retrieves text from file
 
         Accepts CLI argument
 
@@ -106,5 +132,6 @@ FIZZBUZZ BUZZ FIZZ FIZZBUZZBUZZ"""
 
 
 if __name__ == "__main__":
-    FBL = Translator()
+    FBL = Translator(retrieve_file())
+    # TODO - change to __str__ method
     FBL.print_fbl_doc()
