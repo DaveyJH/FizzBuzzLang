@@ -72,63 +72,37 @@ FIZZBUZZ BUZZ FIZZ FIZZBUZZBUZZ"""
 def retrieve_file():
     """Retrieves text from file
 
-        Accepts CLI argument
+    Accepts CLI argument
 
-        ---
-        returns:
-            str: -- document contents as string
+    ---
+    returns:
+        str: -- document contents as string
 
-        raises:
-            IndexError: -- if no file name provided
-            FileNotFoundError: -- if file is not found
+    raises:
+        IndexError: -- if no file name provided
+        FileNotFoundError: -- if file is not found
 
-            All errors will terminate program
-        """
+        # TODO - remove exit()
+        All errors will terminate program
+    """
 
-        try:
-            file_name = sys.argv[1]
-        except IndexError:
-            print("Error, no file argument given when running file.")
-            print("Program will terminate.")
-            exit()
+    try:
+        file_name = sys.argv[1]
+    except IndexError:
+        print("Error, no file argument given when running file.")
+        # TODO - remove exit() and ' raise a custom exception and let the caller figure it out '
+        print("Program will terminate.")
+        exit()
 
-        while True:
-            try:
-                with open(file_name, "r") as f:
-                    INPUT = f.read()
-                    break
-            except FileNotFoundError as e:
-                print(f"{e}")
-                print("Program will terminate.")
-                exit()
-        return INPUT
-
-    def _convert_to_fbl(self):
-        """Creates a list of FBL characters
-
-        ---
-        returns:
-            list: -- list of FBL converted ASCII characters
-        """
-
-        fbl_text = []
-        for char in self.INPUT:
-            char_finary = self.look_up.setdefault(char, " ".join(
-                ["FIZZ" if char == "0" else "BUZZ" for char in bin(
-                    ord(char))[2:]]))
-            fbl_text.append(self.STORE_CHAR + char_finary)
-
-        return fbl_text
-
-    def print_fbl_doc(self):
-        """Prints a runnable FBL script"""
-
-        print(self.STORE_POS_FIZZ)
-        for char in self.FBL_TEXT_ARRAY:
-            print(char)
-            print(self.MOVE_FORWARD)
-        print(self.END_OF_CODE)
-        print(self.TERMINATE_COMMAND)
+    try:
+        with open(file_name, "r") as f:
+            file_contents = f.read()
+    except FileNotFoundError as e:
+        print(f"{e}")
+        # TODO - remove exit() and ' raise a custom exception and let the caller figure it out '
+        print("Program will terminate.")
+        exit()
+    return file_contents
 
 
 if __name__ == "__main__":
