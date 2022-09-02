@@ -11,100 +11,97 @@ Example:
 Check translation with ./code_runner.py new_fb_file.fb"""
 
 import sys
+from io import StringIO
 
 
-class Translator():
-    """Prepares common FizzBuzzLang functions and retrieves file text content
+def ascii_code_to_finary(char: str) -> str:
+    """Converts a single ascii character to FizzBuzzLang readable finary
 
-    ---
-    Attributes:
-        look_up: dict -- self-populating dictionary of finary refs
-        INPUT: str -- text content of file passed in CLI
-        STORE_CHAR: str -- allows storing of character at data-space location
-        MOVE_FORWARD: str -- move pointer forward one space in data-space
-        STORE_POS_FIZZ: str -- stores current data-space location in FIZZ loc.
-        END_OF_CODE: str -- prints data
-        TERMINATE_COMMAND: str -- termination command to end fbi
-        FBL_TEXT_ARRAY: list -- INPUT written in finary
+    >>> ascii_code_to_finary(101) # "e"
+    'BUZZ BUZZ FIZZ FIZZ BUZZ FIZZ BUZZ'
+    >>> ascii_code_to_finary(63) # "?"
+    'FIZZ BUZZ BUZZ BUZZ BUZZ BUZZ BUZZ'
+    >>> ascii_code_to_finary(48) # "0"
+    'FIZZ BUZZ BUZZ FIZZ FIZZ FIZZ FIZZ'
     """
+    binary = f'{char:07b}'
+    return " ".join("FIZZ" if char == "0" else "BUZZ" for char in binary)
 
-    def __init__(self) -> None:
-        self.look_up = {}
-        self.INPUT = self._retrieve_file()
-        self.STORE_CHAR = "BUZZ FIZZBUZZ FIZZBUZZ "
-        self.MOVE_FORWARD = "FIZZ FIZZ FIZZ"
-        self.STORE_POS_FIZZ = "FIZZ FIZZBUZZ FIZZ"
-        self.END_OF_CODE = """BUZZ FIZZBUZZ FIZZBUZZ BUZZ FIZZ BUZZ FIZZ
+
+FINARY = {chr(i): ascii_code_to_finary(i) for i in range(128)}
+
+
+class Translator:
+    """Translates file to FizzBuzzLang string"""
+
+    # allows storing of character at data-space location
+    __STORE_CHAR: str = "BUZZ FIZZBUZZ FIZZBUZZ "
+    # move pointer forward one space in data-space
+    __MOVE_FORWARD: str = "FIZZ FIZZ FIZZ"
+    # stores current data-space location in FIZZ loc
+    __STORE_POS_FIZZ: str = "FIZZ FIZZBUZZ FIZZ"
+    # prints data in FizzBuzzLang
+    __END_OF_CODE: str = """BUZZ FIZZBUZZ FIZZBUZZ BUZZ FIZZ BUZZ FIZZ
 FIZZ FIZZBUZZ FIZZBUZZ FIZZ
 FIZZBUZZ FIZZ FIZZBUZZBUZZ
 BUZZ BUZZ
 FIZZ FIZZ FIZZ
 FIZZBUZZ BUZZ FIZZ FIZZBUZZBUZZ"""
-        self.TERMINATE_COMMAND = "FIZZBUZZ FIZZBUZZ"
-        self.FBL_TEXT_ARRAY = self._convert_to_fbl()
+    # termination command to end fbi.py
+    __TERMINATE_COMMAND: str = "FIZZBUZZ FIZZBUZZ"
 
-    def _retrieve_file(self):
-        """Retrieves text from file
+    def __init__(self, source: str) -> None:
+        # text content of file passed in CLI
+        self.__SOURCE = source
 
-        Accepts CLI argument
+    def __str__(self):
+        """Outputs a runnable FBL script"""
 
-        ---
-        returns:
-            str: -- document contents as string
+        fbl_doc = StringIO()
+        print(self.__STORE_POS_FIZZ, file=fbl_doc)
+        for char in self.__SOURCE:
+            print(self.__STORE_CHAR + FINARY[char], file=fbl_doc)
+            print(self.__MOVE_FORWARD, file=fbl_doc)
+        print(self.__END_OF_CODE, file=fbl_doc)
+        print(self.__TERMINATE_COMMAND, file=fbl_doc)
 
-        raises:
-            IndexError: -- if no file name provided
-            FileNotFoundError: -- if file is not found
+        return fbl_doc.getvalue()
 
-            All errors will terminate program
-        """
 
-        try:
-            file_name = sys.argv[1]
-        except IndexError:
-            print("Error, no file argument given when running file.")
-            print("Program will terminate.")
-            exit()
+def retrieve_file() -> str:
+    """Retrieves text from file
 
-        while True:
-            try:
-                with open(file_name, "r") as f:
-                    INPUT = f.read()
-                    break
-            except FileNotFoundError as e:
-                print(f"{e}")
-                print("Program will terminate.")
-                exit()
-        return INPUT
+    Accepts CLI argument
 
-    def _convert_to_fbl(self):
-        """Creates a list of FBL characters
+    ---
+    raises:
+        IndexError: -- if no file name provided
+        FileNotFoundError: -- if file is not found
 
-        ---
-        returns:
-            list: -- list of FBL converted ASCII characters
-        """
+        # TODO - remove exit()
+        All errors will terminate program
+    """
 
-        fbl_text = []
-        for char in self.INPUT:
-            char_finary = self.look_up.setdefault(char, " ".join(
-                ["FIZZ" if char == "0" else "BUZZ" for char in bin(
-                    ord(char))[2:]]))
-            fbl_text.append(self.STORE_CHAR + char_finary)
+    try:
+        file_name = sys.argv[1]
+    except IndexError:
+        print("Error, no file argument given when running file.")
+        # TODO - remove exit() and ' raise a custom exception and let the caller figure it out '
+        print("Program will terminate.")
+        exit()
 
-        return fbl_text
-
-    def print_fbl_doc(self):
-        """Prints a runnable FBL script"""
-
-        print(self.STORE_POS_FIZZ)
-        for char in self.FBL_TEXT_ARRAY:
-            print(char)
-            print(self.MOVE_FORWARD)
-        print(self.END_OF_CODE)
-        print(self.TERMINATE_COMMAND)
+    try:
+        with open(file_name, "r") as f:
+            file_contents = f.read()
+    except FileNotFoundError as e:
+        print(f"{e}")
+        # TODO - remove exit() and ' raise a custom exception and let the caller figure it out '
+        print("Program will terminate.")
+        exit()
+    return file_contents
 
 
 if __name__ == "__main__":
-    FBL = Translator()
-    FBL.print_fbl_doc()
+    # import doctest
+    # doctest.testmod()
+    print(Translator(retrieve_file()))
